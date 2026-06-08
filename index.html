@@ -195,6 +195,30 @@
       font-family: 'Barlow Condensed', sans-serif !important;
       font-size: 18px !important; font-weight: 700 !important;
     }
+    .password-wrapper {
+      position: relative;
+    }
+    .toggle-password {
+      position: absolute;
+      right: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: none;
+      border: none;
+      color: var(--text-dim);
+      cursor: pointer;
+      font-size: 20px;
+      padding: 4px;
+      border-radius: 50%;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .toggle-password:hover {
+      color: var(--gold);
+      background: rgba(255,255,255,0.1);
+    }
 
     .btn-primary {
       width: 100%; padding: 15px;
@@ -350,7 +374,6 @@
     <div class="header-nav">
       <button class="btn-outline" onclick="document.getElementById('ranking-modal').classList.add('active')">🏆 Ranking</button>
       <button class="btn-outline" id="btn-admin-nav" onclick="document.getElementById('admin-dialog').showModal()" style="display:none">⚙️ Admin</button>
-      <button class="btn-outline" onclick="document.getElementById('admin-dialog').showModal()">🔐 Admin</button>
     </div>
   </header>
 
@@ -368,7 +391,10 @@
         <p>Ingresa tu código único para registrarte y capturar tus pronósticos.</p>
         <div class="input-group">
           <label>Código de Acceso</label>
-          <input type="text" id="inp-codigo" class="input-code" placeholder="QUI-XXXXX" maxlength="10" />
+          <div class="password-wrapper">
+            <input type="password" id="inp-codigo" class="input-code" placeholder="QUI-XXXXX" maxlength="10" autocomplete="off" />
+            <button type="button" class="toggle-password" id="togglePassword">👁️</button>
+          </div>
         </div>
         <button class="btn-primary btn-blue" id="btn-participar" onclick="validarCodigo()">Ingresar →</button>
         <div class="msg" id="msg-codigo"></div>
@@ -419,7 +445,7 @@
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-app.js";
 import { getAuth, signInWithEmailAndPassword, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-auth.js";
-import { getFirestore, doc, getDoc, collection, query, orderBy, limit, getDocs, setDoc, where } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-firestore.js";
+import { getFirestore, doc, getDoc, collection, query, orderBy, limit, getDocs, setDoc } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-firestore.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyDPJfVaQZmP9c049NnJoUwmWFfrG8GwTdA",
@@ -630,10 +656,27 @@ function showMsg(el, text, type) {
   el.className = 'msg ' + type;
 }
 
-// Format code input
-document.getElementById('inp-codigo').addEventListener('input', function(e) {
-  let v = e.target.value.replace(/[^a-zA-Z0-9-]/g,'').toUpperCase();
-  e.target.value = v;
+// Format code input and toggle password visibility
+document.addEventListener('DOMContentLoaded', function() {
+  const codigoInput = document.getElementById('inp-codigo');
+  const toggleBtn = document.getElementById('togglePassword');
+  
+  // Formatear entrada del código (solo mayúsculas, letras, números y guiones)
+  if (codigoInput) {
+    codigoInput.addEventListener('input', function(e) {
+      let v = e.target.value.replace(/[^a-zA-Z0-9-]/g,'').toUpperCase();
+      e.target.value = v;
+    });
+  }
+  
+  // Toggle visibility del código
+  if (toggleBtn && codigoInput) {
+    toggleBtn.addEventListener('click', function() {
+      const type = codigoInput.getAttribute('type') === 'password' ? 'text' : 'password';
+      codigoInput.setAttribute('type', type);
+      toggleBtn.textContent = type === 'password' ? '👁️' : '🙈';
+    });
+  }
 });
 </script>
 </body>
