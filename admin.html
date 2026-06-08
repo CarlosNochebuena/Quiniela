@@ -241,6 +241,7 @@
   <div class="nav-item" onclick="showPanel('partidos')"><span class="nav-icon">⚽</span>Partidos</div>
   <div class="nav-item" onclick="showPanel('llave')"><span class="nav-icon">🏆</span>Partidos</div>
   <div class="nav-item" onclick="showPanel('ranking')"><span class="nav-icon">🥇</span>Ranking</div>
+  
 
   <div class="nav-section">Gestión</div>
   <div class="nav-item" onclick="showPanel('codigos')"><span class="nav-icon">🔑</span>Códigos</div>
@@ -1718,6 +1719,29 @@ function showMsg(el, text, type) {
 if (window.innerWidth <= 768) {
   document.getElementById('menu-toggle').style.display='block';
 }
+// Cerrar sidebar al hacer clic fuera en móvil
+function cerrarSidebarSiFuera(e) {
+  const sidebar = document.getElementById('sidebar');
+  const toggleBtn = document.getElementById('menu-toggle');
+  if (!sidebar || !toggleBtn) return;
+  
+  // Solo en pantallas pequeñas (max-width: 768px)
+  if (window.innerWidth > 768) return;
+  
+  // Verificar si el sidebar tiene la clase 'open'
+  if (!sidebar.classList.contains('open')) return;
+  
+  // Verificar si el clic fue dentro del sidebar o en el botón toggle
+  const clicDentroSidebar = sidebar.contains(e.target);
+  const clicEnToggle = toggleBtn.contains(e.target);
+  
+  if (!clicDentroSidebar && !clicEnToggle) {
+    sidebar.classList.remove('open');
+  }
+}
+
+// Agregar listener al documento
+document.addEventListener('click', cerrarSidebarSiFuera);
 </script>
 </body>
 </html>
