@@ -324,6 +324,9 @@ const db = getFirestore(app);
 let participanteId = null;
 let participanteData = {};
 let codigoActual = null;
+// 🔒 Cierre global de pronósticos: en true, ya no se pueden agregar/editar pronósticos
+const PRONOSTICOS_CERRADOS = true;
+
 let allPartidos = [];
 // misPronosticos: { [partidoId]: { golesLocal, golesVisitante, docId, ... } }
 let misPronosticos = {};
@@ -620,7 +623,7 @@ function renderPronGrupo(grupo) {
     const pron = misPronosticos[p.id];
     const terminado = p.estado==='Finalizado';
     const enVivo   = p.estado==='En Vivo';
-    const locked   = terminado||enVivo;
+    const locked   = terminado||enVivo||PRONOSTICOS_CERRADOS;
     // Mostrar valores guardados en Firestore (o vacío si no hay pronóstico)
     const gL = pron?.golesLocal ?? '';
     const gV = pron?.golesVisitante ?? '';
@@ -691,6 +694,7 @@ window.onPronChange = function(pid) {
 
 function updateSaveAllBar() {
   const barEl = document.getElementById('save-all-bar');
+  if(PRONOSTICOS_CERRADOS){ barEl.classList.add('hidden'); return; }
   const cnt = Object.keys(pendingChanges).length;
   document.getElementById('pending-count-txt').textContent = `${cnt} pronóstico${cnt!==1?'s':''} por guardar`;
   barEl.classList.toggle('hidden', cnt===0);
