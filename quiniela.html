@@ -155,12 +155,29 @@
     .elim-fase-info{font-size:10px;color:var(--text-dim);font-family:'Barlow Condensed',sans-serif;letter-spacing:1px;margin-bottom:14px;padding:10px 14px;background:rgba(255,255,255,0.03);border-radius:8px;line-height:1.6;}
     .terceros-banner{background:rgba(59,130,246,0.08);border:1px solid rgba(59,130,246,0.2);border-radius:10px;padding:12px 16px;margin-bottom:16px;font-family:'Barlow Condensed',sans-serif;font-size:12px;color:#93c5fd;letter-spacing:0.5px;line-height:1.6;}
     .terceros-banner strong{color:#60a5fa;display:block;margin-bottom:4px;font-size:13px;}
-    /* ── Penales ── */
     .penales-wrap{margin-top:8px;padding:10px 12px;background:rgba(239,68,68,0.07);border:1px solid rgba(239,68,68,0.25);border-radius:8px;}
     .penales-label{font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:#f87171;font-family:'Barlow Condensed',sans-serif;margin-bottom:6px;}
     .penales-btns{display:flex;gap:8px;flex-wrap:wrap;}
     .pen-btn{flex:1;padding:6px 10px;border-radius:7px;border:1px solid rgba(255,255,255,0.1);background:transparent;color:var(--text-dim);font-family:'Barlow Condensed',sans-serif;font-size:12px;cursor:pointer;transition:all 0.2s;}
     .pen-btn.active{border-color:#f87171;background:rgba(239,68,68,0.15);color:#fca5a5;}
+    /* ── Comparar pronósticos ── */
+    .compare-partido{background:var(--glass);border:1px solid var(--glass-border);border-radius:14px;padding:18px;margin-bottom:14px;}
+    .compare-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;flex-wrap:wrap;gap:8px;}
+    .compare-teams{font-family:'Barlow Condensed',sans-serif;font-size:16px;font-weight:700;letter-spacing:1px;}
+    .compare-result{font-family:'Bebas Neue',sans-serif;font-size:20px;color:var(--gold);}
+    .compare-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:8px;}
+    .compare-jugador{background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.07);border-radius:10px;padding:10px 12px;display:flex;align-items:center;justify-content:space-between;gap:8px;}
+    .compare-jugador.yo{border-color:rgba(201,168,76,0.35);background:rgba(201,168,76,0.06);}
+    .compare-jugador.exact{border-color:rgba(34,197,94,0.3);background:rgba(34,197,94,0.06);}
+    .compare-jugador.result{border-color:rgba(234,179,8,0.25);background:rgba(234,179,8,0.05);}
+    .cj-name{font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:600;color:var(--text-dim);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+    .cj-score{font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:1px;}
+    .cj-pts{font-size:10px;font-family:'Barlow Condensed',sans-serif;letter-spacing:1px;padding:2px 6px;border-radius:6px;white-space:nowrap;}
+    .cj-pts.exact{color:#4ade80;background:rgba(34,197,94,0.12);}
+    .cj-pts.result{color:#fbbf24;background:rgba(234,179,8,0.1);}
+    .cj-pts.miss{color:var(--text-dim);background:rgba(255,255,255,0.05);}
+    .cj-pts.pending{color:var(--text-dim);background:transparent;}
+    .disputa-badge{display:inline-flex;align-items:center;gap:6px;background:rgba(59,130,246,0.12);border:1px solid rgba(59,130,246,0.25);border-radius:20px;padding:4px 12px;font-family:'Barlow Condensed',sans-serif;font-size:11px;color:#93c5fd;letter-spacing:0.5px;margin-top:4px;}
     @media(max-width:600px){
       .content{padding:16px;}
       .main-tabs{padding:12px 16px 0;gap:2px;}
@@ -170,6 +187,7 @@
       .match-body{gap:6px;}
       .pron-num{width:44px;height:44px;font-size:22px;}
       .vs-center{min-width:80px;}
+      .compare-grid{grid-template-columns:1fr 1fr;}
     }
   </style>
 </head>
@@ -224,6 +242,7 @@
     <div class="main-tab" onclick="showTab('standings')">📊 Posiciones</div>
     <div class="main-tab" onclick="showTab('llave')">🔗 Llave Oficial</div>
     <div class="main-tab" onclick="showTab('ranking')">🥇 Ranking</div>
+    <div class="main-tab" onclick="showTab('comparar')">👥 Comparar</div>
   </div>
 
   <div class="content">
@@ -240,7 +259,7 @@
       <div id="pron-list"></div>
     </div>
 
-    <!-- MI LLAVE (pronósticos fase eliminatoria) -->
+    <!-- MI LLAVE -->
     <div class="panel" id="panel-mi-llave">
       <div class="mi-llave-banner">
         <div class="ico">🏆</div>
@@ -293,6 +312,23 @@
       <div id="ranking-content"><div class="empty"><div class="empty-icon">🏆</div><div class="empty-text">Cargando ranking...</div></div></div>
     </div>
 
+    <!-- COMPARAR PRONÓSTICOS -->
+    <div class="panel" id="panel-comparar">
+      <div class="section-head">
+        <div class="section-title">👥 Pronósticos de Todos</div>
+      </div>
+      <div class="fase-tabs" id="cmp-fase-tabs">
+        <div class="fase-tab active" onclick="filtrarFaseCmp('Grupos',this)">Grupos</div>
+        <div class="fase-tab" onclick="filtrarFaseCmp('Dieciseisavos',this)">Dieciseisavos</div>
+        <div class="fase-tab" onclick="filtrarFaseCmp('Octavos',this)">Octavos</div>
+        <div class="fase-tab" onclick="filtrarFaseCmp('Cuartos',this)">Cuartos</div>
+        <div class="fase-tab" onclick="filtrarFaseCmp('Semifinal',this)">Semifinal</div>
+        <div class="fase-tab" onclick="filtrarFaseCmp('Final',this)">Final</div>
+      </div>
+      <div class="grupo-tabs" id="cmp-grupo-tabs"></div>
+      <div id="comparar-content"><div class="empty"><div class="empty-icon">⏳</div><div class="empty-text">Cargando pronósticos...</div></div></div>
+    </div>
+
   </div>
 
   <div class="save-all-bar hidden" id="save-all-bar">
@@ -324,11 +360,9 @@ const db = getFirestore(app);
 let participanteId = null;
 let participanteData = {};
 let codigoActual = null;
-// 🔒 Cierre global de pronósticos: en true, ya no se pueden agregar/editar pronósticos
 const PRONOSTICOS_CERRADOS = true;
 
 let allPartidos = [];
-// misPronosticos: { [partidoId]: { golesLocal, golesVisitante, docId, ... } }
 let misPronosticos = {};
 let pendingChanges = {};
 let currentFaseRes  = 'Grupos';
@@ -336,9 +370,11 @@ let currentGrupoRes = 'A';
 let currentGrupoStand = 'A';
 let currentFaseMLlave = 'Dieciseisavos';
 let currentGrupoActual = 'A';
+let currentFaseCmp = 'Grupos';
+let currentGrupoCmp = 'A';
+// Datos de todos los participantes para comparar
+let todosLosParticipantes = []; // [{id, nombre, codigo, puntos, exactos, aciertos, pronosticos:{partidoId->{gL,gV}}}]
 
-// miLlavePronosticos: { [key]: { ganador, localNombre, visitanteNombre, golesLocal, golesVisitante, docId, ... } }
-// key = "Fase_idx" ej: "Dieciseisavos_0", "Octavos_3"
 let miLlavePronosticos = {};
 let clasificadosCache = null;
 
@@ -418,7 +454,6 @@ const iv = setInterval(()=>{ prog=Math.min(prog+20,90); bar.style.width=prog+'%'
     } else if (readonlyMode) {
       participanteId = null;
       participanteData = { nombre: 'Espectador' };
-      // En modo readonly cargamos igual: partidos + colección del código (pronósticos públicos)
       await loadAllData();
       clearInterval(iv); bar.style.width='100%';
       setTimeout(()=>{
@@ -498,20 +533,7 @@ window.registrarParticipante = async function() {
 };
 
 // ═══════════════════════════════════════════════════════
-//  CARGA DE DATOS — CORRECCIÓN PRINCIPAL
-//  Se cargan TODOS los pronósticos en paralelo antes de
-//  renderizar, para que los inputs muestren los valores guardados.
-// ═══════════════════════════════════════════════════════
-// ═══════════════════════════════════════════════════════
-//  HELPERS DE RUTA — Nueva estructura por código
-//
-//  Colección grupos:        {CODIGO}   doc: {numeropartido}      (ej: "QUI-RS5YK/2")
-//  Colección eliminatoria:  {CODIGO}   doc: elim_{fase}_{idx}    (ej: "QUI-RS5YK/elim_Octavos_3")
-//
-//  Beneficios:
-//   • No depende de participanteId para leer → funciona en readonly
-//   • Una sola getDocs por colección carga todo de un jalón
-//   • docId = número de partido (1-104) → legible en Firestore
+//  HELPERS DE RUTA
 // ═══════════════════════════════════════════════════════
 function colCodigo()          { return collection(db, codigoActual); }
 function docPartido(numP)     { return doc(db, codigoActual, String(numP)); }
@@ -519,25 +541,19 @@ function docElim(fase, idx)   { return doc(db, codigoActual, `elim_${fase}_${idx
 
 // ═══════════════════════════════════════════════════════
 //  CARGA DE DATOS
-//  Lee TODA la colección del código de una vez → mínimo de reads
 // ═══════════════════════════════════════════════════════
 async function loadAllData() {
   try {
-
-    // 1. Cargar partidos y todos los docs del código en paralelo
     const [partSnap, codigoSnap] = await Promise.all([
       getDocs(collection(db,'partidos')),
-      getDocs(colCodigo())   // ← TODA la colección del código de un jalón
+      getDocs(colCodigo())
     ]);
 
     allPartidos = partSnap.docs.map(d => ({id:d.id, ...d.data()}));
 
-    // 2. Separar docs de grupos vs eliminatoria por prefijo del docId
     misPronosticos     = {};
     miLlavePronosticos = {};
-    let pronGrupos = 0, pronElim = 0;
 
-    // Mapa númeroPart → partidoId para join rápido
     const numToId = {};
     allPartidos.forEach(p => { if (p.numeropartido) numToId[String(p.numeropartido)] = p.id; });
 
@@ -546,23 +562,16 @@ async function loadAllData() {
       const data  = d.data();
 
       if (docId.startsWith('elim_')) {
-        // "elim_Octavos_3"  →  key = "Octavos_3"
         const key = docId.replace(/^elim_/, '');
         miLlavePronosticos[key] = { ...data, docId };
-        pronElim++;
       } else {
-        // docId es el número del partido como string: "1", "2", ..., "104"
         const pid = numToId[docId];
         if (pid) {
           misPronosticos[pid] = { ...data, docId };
-          pronGrupos++;
-        } else {
-              }
+        }
       }
     });
 
-
-    // 3. Construir UI con los datos completos
     buildAllUI();
     updateMyStats();
   } catch(e) {
@@ -584,13 +593,14 @@ window.showTab = function(id) {
   document.querySelectorAll('.main-tab').forEach(t=>t.classList.remove('active'));
   document.getElementById('panel-'+id).classList.add('active');
   const tabs = document.querySelectorAll('.main-tab');
-  const labels = ['pronosticos','mi-llave','resultados','standings','llave','ranking'];
+  const labels = ['pronosticos','mi-llave','resultados','standings','llave','ranking','comparar'];
   const idx = labels.indexOf(id);
   if(idx>=0) tabs[idx].classList.add('active');
   if(id==='llave') loadLlave();
   if(id==='ranking') loadRanking();
   if(id==='standings') renderStandings();
   if(id==='mi-llave'){ clasificadosCache=null; renderMiLlave(); }
+  if(id==='comparar') loadComparar();
 };
 
 // ═══════════════════════════════════════════════════════
@@ -624,7 +634,6 @@ function renderPronGrupo(grupo) {
     const terminado = p.estado==='Finalizado';
     const enVivo   = p.estado==='En Vivo';
     const locked   = terminado||enVivo||PRONOSTICOS_CERRADOS;
-    // Mostrar valores guardados en Firestore (o vacío si no hay pronóstico)
     const gL = pron?.golesLocal ?? '';
     const gV = pron?.golesVisitante ?? '';
     const rL = p.golesLocal; const rV = p.golesVisitante;
@@ -754,18 +763,15 @@ window.guardarTodo = async function() {
 async function guardarPronostico(pid, gL, gV) {
   const partido = allPartidos.find(p=>p.id===pid);
   const numPartido = partido?.numeropartido;
-  if(!numPartido){ console.error('Partido sin numeropartido:', pid); throw new Error('Partido sin número asignado'); }
+  if(!numPartido){ throw new Error('Partido sin número asignado'); }
 
-  // Nueva estructura: colección = código, doc = número de partido (ej: "QUI-RS5YK/2")
   const docRef = docPartido(numPartido);
   const data = {
     participanteId, partidoId: pid, codigo: codigoActual,
     numeropartido: numPartido,
-    // Datos del partido para tenerlos todos juntos en el documento
     local: partido.local, visitante: partido.visitante,
     grupo: partido.grupo || null, fase: partido.fase,
     fecha: partido.fecha || null,
-    // Pronóstico
     golesLocal: gL, golesVisitante: gV,
     fechaPronostico: new Date().toISOString(),
     puntos: 0, calculado: false
@@ -800,25 +806,374 @@ function mostrarDialogModificar(golesLocal, golesVisitante) {
   });
 }
 
+// ═══════════════════════════════════════════════════════
+//  CÁLCULO DE PUNTOS
+// ═══════════════════════════════════════════════════════
+function calcularPuntosDesdePronosticos(pronosticosMap) {
+  const MULT = 1;
+  let puntos = 0, exactos = 0, aciertos = 0;
+  const finalizados = allPartidos.filter(p => p.fase === 'Grupos' && p.estado === 'Finalizado');
+  finalizados.forEach(p => {
+    const pron = pronosticosMap[p.id];
+    if (!pron || pron.golesLocal === undefined || pron.golesLocal === null || pron.golesLocal === '') return;
+    const gL = Number(pron.golesLocal), gV = Number(pron.golesVisitante);
+    const rL = Number(p.golesLocal), rV = Number(p.golesVisitante);
+    if (isNaN(rL) || isNaN(rV) || isNaN(gL) || isNaN(gV)) return;
+    const ganadorR = rL > rV ? 'local' : rL < rV ? 'visitante' : 'empate';
+    const ganadorP = gL > gV ? 'local' : gL < gV ? 'visitante' : 'empate';
+    const exact  = gL === rL && gV === rV;
+    const aciert = ganadorR === ganadorP;
+    let pts = 0;
+    if (aciert) pts += 1;
+    if (exact)  pts += 2;
+    pts *= MULT;
+    puntos += pts;
+    if (exact)  exactos++;
+    if (aciert) aciertos++;
+  });
+  return { puntos, exactos, aciertos };
+}
+
+// Calcula puntos de un partido específico para un pronóstico dado
+function calcularPtsPorPartido(partido, pronGL, pronGV) {
+  if (!partido || partido.estado !== 'Finalizado') return null;
+  const rL = Number(partido.golesLocal), rV = Number(partido.golesVisitante);
+  if (isNaN(rL) || isNaN(rV)) return null;
+  if (pronGL === undefined || pronGL === null || pronGL === '' || pronGV === undefined || pronGV === null || pronGV === '') return null;
+  const gL = Number(pronGL), gV = Number(pronGV);
+  if (isNaN(gL) || isNaN(gV)) return null;
+  const ganadorR = rL > rV ? 'local' : rL < rV ? 'visitante' : 'empate';
+  const ganadorP = gL > gV ? 'local' : gL < gV ? 'visitante' : 'empate';
+  const exact  = gL === rL && gV === rV;
+  const aciert = ganadorR === ganadorP;
+  let pts = 0; if(aciert) pts++; if(exact) pts+=2;
+  return { pts, exact, aciert };
+}
+
+async function leerPronosticosDeColeccion(codigo) {
+  const snap = await getDocs(collection(db, codigo));
+  const map = {};
+  snap.forEach(d => {
+    const data = d.data();
+    const pid = data.partidoId || d.id;
+    map[pid] = { golesLocal: data.golesLocal, golesVisitante: data.golesVisitante };
+  });
+  return map;
+}
+
+function calcularMisStatsLocal() {
+  return calcularPuntosDesdePronosticos(misPronosticos);
+}
+
+async function calcularRankingDesdeColecciones() {
+  const snapPart = await getDocs(collection(db, 'participantes'));
+  if (snapPart.empty) return [];
+
+  const participantes = snapPart.docs.map(d => ({ id: d.id, ...d.data() }));
+  const batch = [];
+
+  for (const part of participantes) {
+    const codigo = part.codigo;
+    if (!codigo) continue;
+    try {
+      const pronMap = await leerPronosticosDeColeccion(codigo);
+      const stats = calcularPuntosDesdePronosticos(pronMap);
+      batch.push({
+        id:      part.id,
+        nombre:  part.nombre || codigo,
+        codigo:  codigo,
+        puntos:  stats.puntos,
+        exactos: stats.exactos,
+        aciertos:stats.aciertos,
+        pronosticos: pronMap
+      });
+      if ((part.puntos||0) !== stats.puntos ||
+          (part.marcadoresExactos||0) !== stats.exactos ||
+          (part.aciertos||0) !== stats.aciertos) {
+        updateDoc(doc(db,'participantes',part.id), {
+          puntos: stats.puntos,
+          marcadoresExactos: stats.exactos,
+          aciertos: stats.aciertos
+        }).catch(()=>{});
+      }
+    } catch(e) {
+      batch.push({ id:part.id, nombre:part.nombre||codigo, codigo, puntos:part.puntos||0, exactos:part.marcadoresExactos||0, aciertos:part.aciertos||0, pronosticos:{} });
+    }
+  }
+
+  batch.sort((a,b) => b.puntos-a.puntos || b.exactos-a.exactos || b.aciertos-a.aciertos);
+  return batch;
+}
+
 async function updateMyStats() {
-  if(!participanteId) return;
   try {
-    const pDoc = await getDoc(doc(db,'participantes',participanteId));
-    if(!pDoc.exists()) return;
-    const d = pDoc.data();
-    participanteData = d;
-    document.getElementById('my-pts').textContent = d.puntos||0;
-    document.getElementById('my-exact').textContent = d.marcadoresExactos||0;
-    document.getElementById('my-aciertos').textContent = d.aciertos||0;
-    const q = query(collection(db,'participantes'),orderBy('puntos','desc'));
-    const snap = await getDocs(q);
-    const pos = snap.docs.findIndex(x=>x.id===participanteId)+1;
-    document.getElementById('my-pos').textContent = pos>0?pos+'°':'—';
-  } catch(e){ console.error(e); }
+    const local = calcularMisStatsLocal();
+    document.getElementById('my-pts').textContent = local.puntos;
+    document.getElementById('my-exact').textContent = local.exactos;
+    document.getElementById('my-aciertos').textContent = local.aciertos;
+
+    const ranking = await calcularRankingDesdeColecciones();
+    todosLosParticipantes = ranking; // guardar para usar en Comparar
+    let pos = -1;
+    if (participanteId) {
+      pos = ranking.findIndex(x => x.id === participanteId) + 1;
+    } else if (codigoActual) {
+      pos = ranking.findIndex(x => x.codigo === codigoActual) + 1;
+    }
+    document.getElementById('my-pos').textContent = pos > 0 ? pos+'°' : '—';
+  } catch(e) {
+    console.error('[updateMyStats]', e);
+  }
 }
 
 // ═══════════════════════════════════════════════════════
-//  CÁLCULO DE CLASIFICADOS DESDE PRONÓSTICOS DE GRUPOS
+//  RANKING
+// ═══════════════════════════════════════════════════════
+async function loadRanking() {
+  const el = document.getElementById('ranking-content');
+  el.innerHTML = '<div class="empty"><div class="empty-icon">⏳</div><div class="empty-text">Calculando puntos de todos los participantes...</div></div>';
+  try {
+    const ranking = await calcularRankingDesdeColecciones();
+    todosLosParticipantes = ranking;
+    if (!ranking.length) {
+      el.innerHTML = '<div class="empty"><div class="empty-text">Sin participantes aún.</div></div>';
+      return;
+    }
+
+    let miPos = -1;
+    if (participanteId) miPos = ranking.findIndex(x => x.id === participanteId) + 1;
+    else if (codigoActual) miPos = ranking.findIndex(x => x.codigo === codigoActual) + 1;
+    if (miPos > 0) document.getElementById('my-pos').textContent = miPos + '°';
+
+    // Calcular posiciones con empates
+    // Asignar posición real (la posición del primero del grupo con igual puntuación)
+    const rankConPos = [];
+    let i = 0;
+    while (i < ranking.length) {
+      const r = ranking[i];
+      // Buscar cuántos comparten la misma posición
+      let j = i;
+      while (j < ranking.length &&
+             ranking[j].puntos === r.puntos &&
+             ranking[j].exactos === r.exactos &&
+             ranking[j].aciertos === r.aciertos) j++;
+      const cantidadEmpatados = j - i;
+      for (let k = i; k < j; k++) {
+        rankConPos.push({ ...ranking[k], posReal: i + 1, empatados: cantidadEmpatados });
+      }
+      i = j;
+    }
+
+    const medals = ['🥇','🥈','🥉'];
+    const hayFinalizados = allPartidos.filter(p => p.fase==='Grupos' && p.estado==='Finalizado').length;
+
+    el.innerHTML = `
+      <div style="font-size:11px;color:var(--text-dim);font-family:'Barlow Condensed',sans-serif;letter-spacing:1px;text-align:center;margin-bottom:14px;padding:8px;background:rgba(255,255,255,0.03);border-radius:8px;">
+        PUNTOS CALCULADOS EN TIEMPO REAL · ${hayFinalizados} PARTIDO${hayFinalizados!==1?'S':''} FINALIZADO${hayFinalizados!==1?'S':''}
+      </div>
+      ${rankConPos.map((p) => {
+        const esYo = p.id === participanteId || p.codigo === codigoActual;
+        const pos = p.posReal;
+        const podio = pos <= 3 ? `p${pos}` : '';
+        const posLabel = pos <= 3 && p.empatados === 1 ? medals[pos-1] : pos+'°';
+        let disputaBadge = '';
+        if (p.empatados > 1) {
+          disputaBadge = `<div class="disputa-badge">⚔️ Disputas el ${pos}° lugar con ${p.empatados - 1} persona${p.empatados-1!==1?'s':''} más</div>`;
+        }
+        return `
+        <div class="ranking-item ${esYo ? 'me' : ''}">
+          <div class="rank-pos ${podio}">${posLabel}</div>
+          <div style="flex:1">
+            <div class="rank-name">
+              ${p.nombre}
+              ${esYo ? '<span style="font-size:10px;color:var(--gold);letter-spacing:1px;font-family:\'Barlow Condensed\',sans-serif"> (Tú)</span>' : ''}
+            </div>
+            <div class="rank-sub">${p.exactos} exacto${p.exactos!==1?'s':''} · ${p.aciertos} acierto${p.aciertos!==1?'s':''} · ${p.codigo}</div>
+            ${disputaBadge}
+          </div>
+          <div class="rank-pts">${p.puntos}</div>
+        </div>`;
+      }).join('')}
+    `;
+  } catch(e) {
+    console.error('[loadRanking]', e);
+    el.innerHTML = '<div class="empty"><div class="empty-text">Error al calcular ranking: ' + e.message + '</div></div>';
+  }
+}
+
+// ═══════════════════════════════════════════════════════
+//  COMPARAR PRONÓSTICOS DE TODOS LOS JUGADORES
+// ═══════════════════════════════════════════════════════
+window.filtrarFaseCmp = function(fase, el) {
+  currentFaseCmp = fase;
+  document.querySelectorAll('#cmp-fase-tabs .fase-tab').forEach(t=>t.classList.remove('active'));
+  el.classList.add('active');
+  if(fase==='Grupos'){
+    buildGrupoTabsCmp();
+  } else {
+    document.getElementById('cmp-grupo-tabs').innerHTML='';
+  }
+  renderComparar();
+};
+
+window.filtrarGrupoCmp = function(g, el) {
+  currentGrupoCmp = g;
+  document.querySelectorAll('#cmp-grupo-tabs .grupo-tab').forEach(t=>t.classList.remove('active'));
+  (el||event.target).classList.add('active');
+  renderComparar();
+};
+
+function buildGrupoTabsCmp() {
+  const grupos = [...new Set(allPartidos.filter(p=>p.grupo).map(p=>p.grupo))].sort();
+  const el = document.getElementById('cmp-grupo-tabs');
+  el.innerHTML = grupos.map(g=>`<div class="grupo-tab ${g===currentGrupoCmp?'active':''}" onclick="filtrarGrupoCmp('${g}',this)">${g}</div>`).join('');
+}
+
+async function loadComparar() {
+  const el = document.getElementById('comparar-content');
+  el.innerHTML = '<div class="empty"><div class="empty-icon">⏳</div><div class="empty-text">Cargando pronósticos de todos los jugadores...</div></div>';
+  try {
+    // Si ya los tenemos cargados no volvemos a leer
+    if (!todosLosParticipantes.length) {
+      const ranking = await calcularRankingDesdeColecciones();
+      todosLosParticipantes = ranking;
+    }
+    if(currentFaseCmp === 'Grupos') buildGrupoTabsCmp();
+    else document.getElementById('cmp-grupo-tabs').innerHTML = '';
+    renderComparar();
+  } catch(e) {
+    el.innerHTML = '<div class="empty"><div class="empty-text">Error al cargar: ' + e.message + '</div></div>';
+  }
+}
+
+function renderComparar() {
+  const el = document.getElementById('comparar-content');
+  if (!todosLosParticipantes.length) {
+    el.innerHTML = '<div class="empty"><div class="empty-icon">👥</div><div class="empty-text">No hay participantes registrados aún.</div></div>';
+    return;
+  }
+
+  // Filtrar partidos según la fase/grupo seleccionado
+  let lista = allPartidos.filter(p => p.fase === currentFaseCmp);
+  if (currentFaseCmp === 'Grupos') lista = lista.filter(p => p.grupo === currentGrupoCmp);
+  lista.sort((a, b) => {
+    if (a.fecha && b.fecha) return a.fecha > b.fecha ? 1 : -1;
+    return (a.numeropartido||0) - (b.numeropartido||0);
+  });
+
+  if (!lista.length) {
+    el.innerHTML = '<div class="empty"><div class="empty-icon">⚽</div><div class="empty-text">No hay partidos en esta fase.</div></div>';
+    return;
+  }
+
+  // Calcular posición real de cada participante para mostrar disputas
+  const ranking = todosLosParticipantes;
+  const rankMap = {}; // id -> { posReal, empatados }
+  let i = 0;
+  while (i < ranking.length) {
+    const r = ranking[i];
+    let j = i;
+    while (j < ranking.length &&
+           ranking[j].puntos === r.puntos &&
+           ranking[j].exactos === r.exactos &&
+           ranking[j].aciertos === r.aciertos) j++;
+    const empatados = j - i;
+    for (let k = i; k < j; k++) {
+      rankMap[ranking[k].id] = { posReal: i + 1, empatados };
+    }
+    i = j;
+  }
+
+  let html = '';
+
+  lista.forEach(partido => {
+    const terminado = partido.estado === 'Finalizado';
+    const enVivo = partido.estado === 'En Vivo';
+    const statusCls = terminado ? 'done' : enVivo ? 'live' : 'pending';
+    const statusTxt = partido.estado || 'Pendiente';
+    const rL = partido.golesLocal;
+    const rV = partido.golesVisitante;
+
+    html += `<div class="compare-partido">
+      <div class="compare-header">
+        <div>
+          <div class="compare-teams">${flag(partido.local)} ${partido.local} <span style="color:var(--text-dim);font-size:13px">vs</span> ${flag(partido.visitante)} ${partido.visitante}</div>
+          <div style="font-size:11px;color:var(--text-dim);font-family:'Barlow Condensed',sans-serif;letter-spacing:1px;margin-top:3px">${fmtDate(partido.fecha)}${partido.grupo?' · Grupo '+partido.grupo:' · '+partido.fase}</div>
+        </div>
+        <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px">
+          <span class="match-status-badge ${statusCls}">${statusTxt}</span>
+          ${terminado ? `<span class="compare-result">${rL} - ${rV}</span>` : enVivo ? `<span class="compare-result" style="color:#f87171">${rL??'?'} - ${rV??'?'}</span>` : ''}
+        </div>
+      </div>
+      <div class="compare-grid">`;
+
+    todosLosParticipantes.forEach(jugador => {
+      const esYo = jugador.id === participanteId;
+      const pron = jugador.pronosticos ? jugador.pronosticos[partido.id] : null;
+      const tienePronostico = pron && pron.golesLocal !== undefined && pron.golesLocal !== null && pron.golesLocal !== '';
+      const rInfo = tienePronostico ? calcularPtsPorPartido(partido, pron.golesLocal, pron.golesVisitante) : null;
+
+      let clsJugador = esYo ? 'yo' : '';
+      let cjScoreColor = 'var(--text)';
+      let cjPtsLabel = '';
+      let cjPtsCls = 'pending';
+
+      if (tienePronostico) {
+        if (rInfo) {
+          if (rInfo.exact) { clsJugador += ' exact'; cjScoreColor = '#4ade80'; cjPtsLabel = `⭐ ${rInfo.pts}pts`; cjPtsCls = 'exact'; }
+          else if (rInfo.aciert) { clsJugador += ' result'; cjScoreColor = '#fbbf24'; cjPtsLabel = `✓ ${rInfo.pts}pt`; cjPtsCls = 'result'; }
+          else if (terminado) { cjPtsLabel = '✗ 0pts'; cjPtsCls = 'miss'; }
+        }
+      }
+
+      const rankInfo = rankMap[jugador.id];
+      const rankLabel = rankInfo ? rankInfo.posReal + '°' : '—';
+
+      html += `<div class="compare-jugador ${clsJugador.trim()}">
+        <div>
+          <div class="cj-name" title="${jugador.nombre}">${esYo ? '⭐ ' : ''}${jugador.nombre}</div>
+          <div style="font-size:10px;color:var(--text-dim);font-family:'Barlow Condensed',sans-serif;margin-top:2px">${rankLabel} · ${jugador.puntos}pts totales</div>
+        </div>
+        <div style="display:flex;flex-direction:column;align-items:flex-end;gap:3px">
+          <div class="cj-score" style="color:${cjScoreColor}">${tienePronostico ? pron.golesLocal+' - '+pron.golesVisitante : '—'}</div>
+          ${tienePronostico && cjPtsLabel ? `<span class="cj-pts ${cjPtsCls}">${cjPtsLabel}</span>` : tienePronostico && !terminado ? '<span class="cj-pts pending">Pendiente</span>' : !tienePronostico ? '<span class="cj-pts miss">Sin pron.</span>' : ''}
+        </div>
+      </div>`;
+    });
+
+    html += `</div>`;
+
+    // Mostrar disputas de posición entre los jugadores de esta vista
+    // Agrupar jugadores con misma posición total
+    const gruposDisputa = {};
+    todosLosParticipantes.forEach(j => {
+      const ri = rankMap[j.id];
+      if (!ri) return;
+      const key = ri.posReal;
+      if (!gruposDisputa[key]) gruposDisputa[key] = [];
+      gruposDisputa[key].push(j);
+    });
+
+    // Mostrar solo los grupos con > 1 persona empatada
+    const disputasHtml = Object.entries(gruposDisputa)
+      .filter(([, arr]) => arr.length > 1)
+      .map(([pos, arr]) => {
+        const nombres = arr.map(j => j.nombre).join(', ');
+        return `<div class="disputa-badge">⚔️ ${arr.length} jugadores disputan el ${pos}° lugar: ${nombres}</div>`;
+      }).join('');
+
+    if (disputasHtml) {
+      html += `<div style="margin-top:12px;display:flex;flex-wrap:wrap;gap:6px">${disputasHtml}</div>`;
+    }
+
+    html += `</div>`; // cierra compare-partido
+  });
+
+  el.innerHTML = html;
+}
+
+// ═══════════════════════════════════════════════════════
+//  CLASIFICADOS Y FASES ELIMINATORIAS
 // ═══════════════════════════════════════════════════════
 function calcularClasificadosDesdePronosticos() {
   if(clasificadosCache) return clasificadosCache;
@@ -893,18 +1248,6 @@ function calcularClasificadosDesdePronosticos() {
   return clasificadosCache;
 }
 
-// ═══════════════════════════════════════════════════════
-//  FUNCIONES MODULARES DE FASE ELIMINATORIA
-//  calcularDieciseisavos / calcularOctavos / calcularCuartos
-//  calcularSemifinales / calcularFinal / obtenerGanador
-// ═══════════════════════════════════════════════════════
-
-/**
- * obtenerGanador(key)
- * Devuelve el nombre del equipo ganador de un partido eliminatorio
- * guardado en miLlavePronosticos, considerando penales en caso de empate.
- * Retorna null si el partido no tiene ganador elegido.
- */
 function obtenerGanador(key) {
   const pron = miLlavePronosticos[key];
   if (!pron) return null;
@@ -913,12 +1256,6 @@ function obtenerGanador(key) {
   return ganador === 'local' ? localNombre : visitanteNombre;
 }
 
-/**
- * calcularDieciseisavos(primeros, segundos, mejoresTerceros)
- * Genera el bracket oficial de los 16 partidos de dieciseisavos
- * a partir de los clasificados de grupos.
- * Emparejamiento según formato FIFA Mundial 2026 (12 grupos A-L).
- */
 function calcularDieciseisavos(primeros, segundos, mejoresTerceros) {
   const p  = (g) => primeros.find(e => e.grupo === g) || { nombre: '1° Grupo ' + g, grupo: g };
   const s  = (g) => segundos.find(e => e.grupo === g) || { nombre: '2° Grupo ' + g, grupo: g };
@@ -944,12 +1281,6 @@ function calcularDieciseisavos(primeros, segundos, mejoresTerceros) {
   ];
 }
 
-/**
- * calcularOctavos()
- * Genera los 8 partidos de octavos a partir de los ganadores de dieciseisavos.
- * Par de partidos: (D1 vs D2), (D3 vs D4), (D5 vs D6), (D7 vs D8),
- *                  (D9 vs D10), (D11 vs D12), (D13 vs D14), (D15 vs D16)
- */
 function calcularOctavos() {
   const octavos = [];
   for (let i = 0; i < 8; i++) {
@@ -962,10 +1293,6 @@ function calcularOctavos() {
   return octavos;
 }
 
-/**
- * calcularCuartos()
- * Genera los 4 partidos de cuartos a partir de los ganadores de octavos.
- */
 function calcularCuartos() {
   const cuartos = [];
   for (let i = 0; i < 4; i++) {
@@ -978,10 +1305,6 @@ function calcularCuartos() {
   return cuartos;
 }
 
-/**
- * calcularSemifinales()
- * Genera los 2 partidos de semis a partir de los ganadores de cuartos.
- */
 function calcularSemifinales() {
   const semis = [];
   for (let i = 0; i < 2; i++) {
@@ -994,11 +1317,6 @@ function calcularSemifinales() {
   return semis;
 }
 
-/**
- * calcularFinal()
- * Genera el partido por 3er lugar y la Gran Final.
- * Retorna [ { id:'F_Tercero', local, visitante }, { id:'F_Final', local, visitante } ]
- */
 function calcularFinal() {
   const semi0 = miLlavePronosticos['Semifinal_0'];
   const semi1 = miLlavePronosticos['Semifinal_1'];
@@ -1018,18 +1336,6 @@ function calcularFinal() {
   ];
 }
 
-// ═══════════════════════════════════════════════════════
-//  MI LLAVE — Panel de pronósticos eliminatorios
-//
-//  Estructura de fases y partidos por fase:
-//  Dieciseisavos: 16 partidos  (idx 0-15)
-//  Octavos:        8 partidos  (idx 0-7)   ganadores de Dieciseisavos de 2 en 2
-//  Cuartos:        4 partidos  (idx 0-3)   ganadores de Octavos de 2 en 2
-//  Semifinal:      2 partidos  (idx 0-1)   ganadores de Cuartos de 2 en 2
-//  Final:          2 partidos  (idx 0=3er lugar, idx 1=gran final)
-// ═══════════════════════════════════════════════════════
-
-// Tabla de cuántos partidos hay en cada fase
 const PARTIDOS_POR_FASE = {
   'Dieciseisavos': 16,
   'Octavos': 8,
@@ -1037,7 +1343,6 @@ const PARTIDOS_POR_FASE = {
   'Semifinal': 2
 };
 
-// Función de compatibilidad: armarBracketDieciseisavos sigue usando calcularDieciseisavos internamente
 function armarBracketDieciseisavos(primeros, segundos, mejoresTerceros) {
   return calcularDieciseisavos(primeros, segundos, mejoresTerceros);
 }
@@ -1074,7 +1379,6 @@ function renderMiLlave() {
   else if(fase==='Final')    renderFaseFinal(el, clasi);
 }
 
-// ── Obtener el nombre de local/visitante para un partido de una fase ──────────
 function obtenerEquiposPartido(fase, idx, clasi) {
   if (fase === 'Dieciseisavos') {
     const p = clasi.dieciseisavos[idx];
@@ -1086,7 +1390,6 @@ function obtenerEquiposPartido(fase, idx, clasi) {
     };
   }
 
-  // Para Octavos, Cuartos, Semifinal: usar obtenerGanador() de la fase anterior
   const faseAnteriorMap = { 'Octavos': 'Dieciseisavos', 'Cuartos': 'Octavos', 'Semifinal': 'Cuartos' };
   const faseAnt = faseAnteriorMap[fase];
   const idxL = idx * 2;
@@ -1101,7 +1404,6 @@ function obtenerEquiposPartido(fase, idx, clasi) {
   return { localNombre, visitanteNombre, localGrupo: '', visitanteGrupo: '' };
 }
 
-// ── Renderizar una fase eliminatoria genérica (Dieciseisavos, Octavos, Cuartos, Semifinal) ──
 function renderFaseEliminatoria(el, clasi, fase) {
   const faseLabels = {
     'Dieciseisavos': 'Dieciseisavos de Final',
@@ -1114,7 +1416,6 @@ function renderFaseEliminatoria(el, clasi, fase) {
   const totalPartidos = PARTIDOS_POR_FASE[fase];
   const faseAnt = { 'Octavos':'Dieciseisavos', 'Cuartos':'Octavos', 'Semifinal':'Cuartos' }[fase];
 
-  // Para Octavos/Cuartos/Semifinal: verificar que haya ganadores elegidos en la fase anterior
   if (fase !== 'Dieciseisavos') {
     const ganadoresElegidos = Array.from({ length: totalPartidos * 2 }, (_, i) =>
       !!miLlavePronosticos[faseAnt + '_' + i]?.ganador
@@ -1131,7 +1432,6 @@ function renderFaseEliminatoria(el, clasi, fase) {
     }
   }
 
-  // Info de terceros para Dieciseisavos
   let extraInfo = '';
   if (fase === 'Dieciseisavos') {
     const tercerosInfo = clasi.mejoresTerceros.map(t =>
@@ -1150,7 +1450,6 @@ function renderFaseEliminatoria(el, clasi, fase) {
       : `Los equipos provienen de los ganadores que elegiste en ${faseAnt}. Anota el marcador y elige quién avanza.`}
   </div>${extraInfo}`;
 
-  // Generar cards de partidos
   for (let idx = 0; idx < totalPartidos; idx++) {
     html += buildElimCard(fase, idx, clasi, faseLabels[fase], mult);
   }
@@ -1158,7 +1457,6 @@ function renderFaseEliminatoria(el, clasi, fase) {
   el.innerHTML = html;
 }
 
-// ── Construye el HTML de una tarjeta eliminatoria, con soporte de penales ─────
 function buildElimCard(fase, idx, clasi, faseLabel, mult) {
   const key  = fase + '_' + idx;
   const pron = miLlavePronosticos[key] || {};
@@ -1166,17 +1464,15 @@ function buildElimCard(fase, idx, clasi, faseLabel, mult) {
   const gL     = pron.golesLocal     ?? '';
   const gV     = pron.golesVisitante ?? '';
   const ganador = pron.ganador || '';
-  const penalesGanador = pron.penalesGanador || '';  // 'local' | 'visitante' | ''
+  const penalesGanador = pron.penalesGanador || '';
   const saved  = gL !== '' && gV !== '';
 
-  // ¿Hay empate en el marcador? → mostrar selector de penales
   const esEmpate = saved && Number(gL) === Number(gV);
 
   const etiqueta = fase === 'Dieciseisavos'
     ? (clasi.dieciseisavos[idx]?.etiqueta || 'Partido ' + (idx + 1))
     : 'Partido ' + (idx + 1);
 
-  // Bloque de penales (solo visible cuando hay empate)
   const penalesBlock = esEmpate ? `
     <div class="penales-wrap">
       <div class="penales-label">⚽ Empate — ¿Quién gana en penales?</div>
@@ -1234,7 +1530,6 @@ function buildElimCard(fase, idx, clasi, faseLabel, mult) {
   </div>`;
 }
 
-// ── Renderizar Final (Gran Final + Tercer Lugar) ──────────────────────────────
 function renderFaseFinal(el, clasi) {
   const finalMatches = calcularFinal();
   const perSemi0  = finalMatches[0].local;
@@ -1255,7 +1550,6 @@ function renderFaseFinal(el, clasi) {
     return;
   }
 
-  // Tercer Lugar (idx=0) — usa buildElimCard con fase 'Final'
   const keyTercero  = 'Final_0';
   const pronTercero = miLlavePronosticos[keyTercero] || {};
   const gLT = pronTercero.golesLocal     ?? '';
@@ -1306,7 +1600,6 @@ function renderFaseFinal(el, clasi) {
     </div>
   </div>`;
 
-  // Gran Final (idx=1)
   const keyFinal  = 'Final_1';
   const pronFinal = miLlavePronosticos[keyFinal] || {};
   const gLF = pronFinal.golesLocal     ?? '';
@@ -1363,13 +1656,11 @@ function renderFaseFinal(el, clasi) {
   el.innerHTML = html;
 }
 
-// ── CAMBIO EN INPUT ELIMINATORIO ─────────────────────
 window.onElimChange = function(key, fase, idx) {
   const btn = document.getElementById('sbtn-elim-' + key);
   if (btn) btn.textContent = 'Guardar';
   document.getElementById('elim-card-' + key)?.classList.remove('saved');
 
-  // Actualizar bloque de penales en tiempo real
   const gLEl = document.getElementById('eL-' + key);
   const gVEl = document.getElementById('eV-' + key);
   if (!gLEl || !gVEl) return;
@@ -1390,7 +1681,6 @@ window.onElimChange = function(key, fase, idx) {
     if (!penWrap) {
       penWrap = document.createElement('div');
       penWrap.className = 'penales-wrap';
-      // Insertar antes del bloque "¿Quién avanza?"
       const advanceBlock = card.querySelector('[style*="margin-bottom:8px"]');
       card.insertBefore(penWrap, advanceBlock);
     }
@@ -1411,7 +1701,6 @@ window.onElimChange = function(key, fase, idx) {
   }
 };
 
-// ── ELEGIR GANADOR ────────────────────────────────────
 window.elegirGanador = async function(key, fase, idx, lado) {
   const clasi = calcularClasificadosDesdePronosticos();
   let localNombre = '', visitanteNombre = '', localGrupo = '', visitanteGrupo = '';
@@ -1419,10 +1708,10 @@ window.elegirGanador = async function(key, fase, idx, lado) {
   if(fase === 'Final'){
     const semi0 = miLlavePronosticos['Semifinal_0'];
     const semi1 = miLlavePronosticos['Semifinal_1'];
-    if(idx === 0){ // Tercer lugar
+    if(idx === 0){
       localNombre  = semi0?.ganador ? (semi0[semi0.ganador==='local'?'visitanteNombre':'localNombre'] || 'Perdedor SF1') : 'Perdedor SF1';
       visitanteNombre = semi1?.ganador ? (semi1[semi1.ganador==='local'?'visitanteNombre':'localNombre'] || 'Perdedor SF2') : 'Perdedor SF2';
-    } else { // Gran final
+    } else {
       localNombre  = semi0?.ganador ? (semi0[semi0.ganador+'Nombre'] || 'Ganador SF1') : 'Ganador SF1';
       visitanteNombre = semi1?.ganador ? (semi1[semi1.ganador+'Nombre'] || 'Ganador SF2') : 'Ganador SF2';
     }
@@ -1444,17 +1733,14 @@ window.elegirGanador = async function(key, fase, idx, lado) {
   renderMiLlave();
 };
 
-// ── ELEGIR GANADOR EN PENALES ─────────────────────────
 window.elegirPenales = async function(key, fase, idx, lado) {
   const existing = miLlavePronosticos[key] || {};
   miLlavePronosticos[key] = { ...existing, penalesGanador: lado };
 
-  // Si el ganador elegido como avanzar no está seteado, auto-seleccionar el mismo lado
   if (!existing.ganador) {
     miLlavePronosticos[key].ganador = lado;
   }
 
-  // Actualizar estilos de botones de penales sin re-renderizar toda la fase
   const card = document.getElementById('elim-card-' + key);
   if (card) {
     card.querySelectorAll('.pen-btn').forEach((btn, i) => {
@@ -1462,7 +1748,6 @@ window.elegirPenales = async function(key, fase, idx, lado) {
     });
   }
 
-  // Guardar en Firestore
   try {
     const clasi = calcularClasificadosDesdePronosticos();
     let localNombre = '', visitanteNombre = '', localGrupo = '', visitanteGrupo = '';
@@ -1538,7 +1823,6 @@ window.guardarElim = async function(key, fase, idx) {
 async function guardarElimInterno(key, fase, idx, localNombre, visitanteNombre, localGrupo, visitanteGrupo, gL, gV) {
   const existing = miLlavePronosticos[key] || {};
 
-  // Nueva estructura: colección = código, doc = "elim_{fase}_{idx}"  (ej: "QUI-RS5YK/elim_Octavos_3")
   const elimDocId = `elim_${fase}_${idx}`;
   const elimRef   = docElim(fase, idx);
 
@@ -1557,7 +1841,6 @@ async function guardarElimInterno(key, fase, idx, localNombre, visitanteNombre, 
     data.golesVisitante = existing.golesVisitante;
   }
 
-  // setDoc con merge: crea o actualiza sin borrar campos no incluidos
   await setDoc(elimRef, data, { merge: true });
   miLlavePronosticos[key] = { ...existing, ...data, docId: elimDocId };
 }
@@ -1713,7 +1996,7 @@ function renderStandings() {
 }
 
 // ═══════════════════════════════════════════════════════
-//  LLAVE OFICIAL (desde Firebase)
+//  LLAVE OFICIAL
 // ═══════════════════════════════════════════════════════
 async function loadLlave() {
   const el = document.getElementById('llave-content');
@@ -1755,30 +2038,6 @@ async function loadLlave() {
     }
     el.innerHTML = html||'<div class="empty"><div class="empty-icon">🏆</div><div class="empty-text">La llave oficial se generará al finalizar la fase de grupos.</div></div>';
   } catch(e){ el.innerHTML='<div class="empty empty-text">Error al cargar llave</div>'; }
-}
-
-// ═══════════════════════════════════════════════════════
-//  RANKING
-// ═══════════════════════════════════════════════════════
-async function loadRanking() {
-  const el = document.getElementById('ranking-content');
-  el.innerHTML='<div class="empty"><div class="empty-icon">⏳</div><div class="empty-text">Cargando...</div></div>';
-  try {
-    const q = query(collection(db,'participantes'), orderBy('puntos','desc'));
-    const snap = await getDocs(q);
-    if(snap.empty){ el.innerHTML='<div class="empty"><div class="empty-text">Sin participantes aún.</div></div>'; return; }
-    const docs = snap.docs.map(d=>({id:d.id,...d.data()}));
-    const medals = ['🥇','🥈','🥉'];
-    el.innerHTML = docs.map((p,i)=>`
-    <div class="ranking-item ${p.id===participanteId?'me':''}">
-      <div class="rank-pos ${i<3?'p'+(i+1):''}">${medals[i]||i+1}</div>
-      <div style="flex:1">
-        <div class="rank-name">${p.nombre} ${p.id===participanteId?'<span style="font-size:10px;color:var(--gold);letter-spacing:1px;font-family:\'Barlow Condensed\',sans-serif">(Tú)</span>':''}</div>
-        <div class="rank-sub">${p.marcadoresExactos||0} exactos · ${p.aciertos||0} aciertos · Código: ${p.codigo}</div>
-      </div>
-      <div class="rank-pts">${p.puntos||0}</div>
-    </div>`).join('');
-  } catch(e){ el.innerHTML='<div class="empty empty-text">Error al cargar ranking</div>'; }
 }
 
 function showMsg(el,text,type){ el.textContent=text; el.className='msg '+type; }
